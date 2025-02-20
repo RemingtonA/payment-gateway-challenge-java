@@ -13,10 +13,32 @@ public class CommonExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(CommonExceptionHandler.class);
 
+  /**
+   * Handles business logic errors in PaymentGatewayService.
+   */
   @ExceptionHandler(EventProcessingException.class)
-  public ResponseEntity<ErrorResponse> handleException(EventProcessingException ex) {
-    LOG.error("Exception happened", ex);
-    return new ResponseEntity<>(new ErrorResponse("Page not found"),
-        HttpStatus.NOT_FOUND);
+  public ResponseEntity<ErrorResponse> handleEventProcessingException(EventProcessingException ex) {
+    LOG.error("Application error: {}", ex.getMessage(), ex);
+    
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+
+    if (ex.getMessage().contains("Invalid payment ID")) {
+      status = HttpStatus.NOT_FOUND;
+    } else if (ex.getMessage().contains("unreachable")) {
+      status = HttpStatus.SERVICE_UNAVAILABLE;
+    } else if (ex.getMessage().contains("Bank error")) {
+      status = HttpStatus.BAD_GATEWAY;
+    }
+
+    return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), status);
+  }
+
+  /**
+   * Handles all unexpected runtime exceptions.
+   */
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+    LOG.error("Unexpected error: {}", ex.getMessage(), ex);
+    return new ResponseEntity<>(new ErrorResponse("Unexpected error occurred"), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

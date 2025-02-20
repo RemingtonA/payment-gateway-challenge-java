@@ -1,17 +1,50 @@
 package com.checkout.payment.gateway.model;
 
 import com.checkout.payment.gateway.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.UUID;
 
 public class PostPaymentResponse {
+
+  @JsonProperty("id")
+  @Schema(description = "Unique payment identifier", example = "550e8400-e29b-41d4-a716-446655440000")
   private UUID id;
+
+  @JsonProperty("status")
+  @Schema(description = "Payment status", example = "AUTHORIZED")
   private PaymentStatus status;
-  private int cardNumberLastFour;
+
+  @JsonProperty("card_number_last_four")
+  @Schema(description = "Last four digits of the card number", example = "8877")
+  private String cardNumberLastFour;
+
+  @JsonProperty("expiry_month")
+  @Schema(description = "Expiry month (1-12)", example = "4")
   private int expiryMonth;
+
+  @JsonProperty("expiry_year")
+  @Schema(description = "Expiry year (must be in the future)", example = "2025")
   private int expiryYear;
+
+  @Schema(description = "Currency (ISO 4217 code)", example = "GBP")
   private String currency;
+
+  @Schema(description = "Amount in minor currency unit (e.g., 100 = £1.00)", example = "100")
   private int amount;
 
+  public PostPaymentResponse() {}
+
+  public PostPaymentResponse(UUID id, PaymentStatus status, String cardNumberLastFour, int expiryMonth, int expiryYear, String currency, int amount) {
+    this.id = id;
+    this.status = status;
+    this.cardNumberLastFour = String.valueOf(cardNumberLastFour);
+    this.expiryMonth = expiryMonth;
+    this.expiryYear = expiryYear;
+    this.currency = currency;
+    this.amount = amount;
+  }
 
   public UUID getId() {
     return id;
@@ -29,11 +62,11 @@ public class PostPaymentResponse {
     this.status = status;
   }
 
-  public int getCardNumberLastFour() {
+  public String getCardNumberLastFour() {
     return cardNumberLastFour;
   }
 
-  public void setCardNumberLastFour(int cardNumberLastFour) {
+  public void setCardNumberLastFour(String cardNumberLastFour) {
     this.cardNumberLastFour = cardNumberLastFour;
   }
 
@@ -71,7 +104,7 @@ public class PostPaymentResponse {
 
   @Override
   public String toString() {
-    return "GetPaymentResponse{" +
+    return "PostPaymentResponse{" +
         "id=" + id +
         ", status=" + status +
         ", cardNumberLastFour=" + cardNumberLastFour +

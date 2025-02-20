@@ -1,15 +1,19 @@
 package com.checkout.payment.gateway.controller;
 
+import com.checkout.payment.gateway.model.GetPaymentResponse;
+import com.checkout.payment.gateway.model.PostPaymentRequest;
 import com.checkout.payment.gateway.model.PostPaymentResponse;
 import com.checkout.payment.gateway.service.PaymentGatewayService;
-import java.util.UUID;
+
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("api")
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/v1")
 public class PaymentGatewayController {
 
   private final PaymentGatewayService paymentGatewayService;
@@ -18,8 +22,14 @@ public class PaymentGatewayController {
     this.paymentGatewayService = paymentGatewayService;
   }
 
+  @PostMapping("/payment") 
+  public ResponseEntity<PostPaymentResponse> processPayment(@Valid @RequestBody PostPaymentRequest paymentRequest) {
+      PostPaymentResponse paymentResponse = paymentGatewayService.processPayment(paymentRequest);
+      return new ResponseEntity<>(paymentResponse, HttpStatus.CREATED);
+  }
+
   @GetMapping("/payment/{id}")
-  public ResponseEntity<PostPaymentResponse> getPostPaymentEventById(@PathVariable UUID id) {
+  public ResponseEntity<GetPaymentResponse> getPostPaymentEventById(@PathVariable UUID id) {
     return new ResponseEntity<>(paymentGatewayService.getPaymentById(id), HttpStatus.OK);
   }
 }
